@@ -1,0 +1,16 @@
+{% extends 'management/pages/base_layout.html' %}
+{% block header %}Create Roles {% endblock %}
+{% block content %}
+<div class="col-6">
+    <form action="/admin/roles/create" method="POST">
+        <div class="form-group">
+            <label class="form-label">Role name: </label>
+            <input class="form-control" name="role_name">
+        </div>
+        <div class="form-group">
+            <button class="btn btn-info" type="reset">Reset</button>
+            <button class="btn btn-success" type="submit">Add Roles</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
