@@ -22,7 +22,7 @@
                 <option value="{{role[0]}}" {% if role[0] == user_info[2] %} selected {% endif %}>{{role[1]}}</option>
                 {% endfor %}
             </select>
-            <input type="radio" value="1" {%  if user_info[1] == 1 %} checked {% endif %} name="status="><label>Actived</label>
+            <input type="radio" value="1" {%  if user_info[1] == 1 %} checked {% endif %} name="status"><label>Actived</label>
             <input type="radio" value="0" {%  if user_info[1] == 0 %} checked {% endif %} name="status"><label>Not Active</label>
         </div>
         <button class="btn btn-success" type="submit">Submit</button>

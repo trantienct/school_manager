@@ -1,0 +1,27 @@
+{% extends 'management/pages/base_layout.html' %}
+{% block header %}Class list {% endblock %}
+{% block content %}
+<div class="col-6">
+    <table class="table">
+                                    <tr>
+                                        <td>ID</td>
+                                        <td>Class Name</td>
+                                        <td colspan="2" class="text-center">Action</td>
+                                    </tr>
+                                {% if not class_data %}
+                                        <tr><td colspan="5">No data!</td></tr>
+                                {% else %}
+                                    {% for class in class_data %}
+                                    <tr>
+                                        <td>{{ class[0]}}</td>
+                                        <td>{{ class[1]}}</td>
+                                        <td class="text-center"><a href="">Edit</a></td>
+                                        <td class="text-center"><a href="">Delete</a></td>
+                                    </tr>
+                                    {% endfor %}
+                                {% endif %}
+                                </table>
+</div>
+
+
+{% endblock %}

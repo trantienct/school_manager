@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
+from Controller.roleController import *
+from Config.constant import *
 from datetime import datetime
 
 def check_username(username):
@@ -51,3 +53,17 @@ def get_user_by_id(user_id):
     if user_info:
         return user_info
     return False
+
+def get_user_by_role(role_name):
+    role_id = get_role_id_by_name(role_name)
+    print(role_id)
+    conn = sqlite3.connect('school_management.db')
+    cur = conn.execute('''SELECT users.id, users.username 
+                          FROM users 
+                          JOIN user_role ON users.id = user_role.user_id
+                          WHERE user_role.role_id = ?  ''', (role_id,))
+    result = cur.fetchall()
+    if len(result) == 0:
+        return False
+    return result
+

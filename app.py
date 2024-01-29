@@ -2,6 +2,7 @@ import os
 from Controller.roleController import *
 from Controller.loginController import *
 from Controller.userController import *
+from Controller.classController import *
 from functools import wraps
 app = Flask(__name__)
 app.secret_key='abcda1234'
@@ -44,12 +45,12 @@ def admin_login():  # put application's code here
         else:
             flash('Your username/ password is not correct. PLease try again')
             return redirect(url_for('admin_login'))
-@app.route('/admin/user_list')
+@app.route('/admin/user/list')
 @login_required
 def user_list():
     all_user = get_all_user()
-    return render_template('management/pages/user_list.html', user_data = all_user)
-@app.route('/admin/user_edit/<user_id>', methods = ['GET', 'POST'])
+    return render_template('management/pages/user/list.html', user_data = all_user)
+@app.route('/admin/user/edit/<user_id>', methods = ['GET', 'POST'])
 @login_required
 def user_edit(user_id):
     if request.method == 'GET':
@@ -57,7 +58,7 @@ def user_edit(user_id):
         user_info = get_user_by_id(user_id)
         if not user_info:
             flash("This user doesn't exist")
-        return render_template('management/pages/edit_user.html', roles = roles, user_info = user_info, user_id = user_id)
+        return render_template('management/pages/user/edit.html', roles = roles, user_info = user_info, user_id = user_id)
     if request.method == 'POST':
         username = request.form['username']
         role_id = request.form.get('role_id')
@@ -68,13 +69,11 @@ def user_edit(user_id):
         print(check)
         if not check:
             flash('Your username has existed. Please try another one')
-            return redirect(url_for('user_edit', user_id))
+            return redirect(url_for('user_edit', user_id=user_id))
         else:
             save = update_user(user_id, username, role_id, status)
             flash('Update information successfully')
-            return redirect(url_for('user_edit', user_id))
-
-
+            return redirect(url_for('user_edit', user_id=user_id))
 
 @app.route('/admin/user/create', methods=['GET', 'POST'])
 @login_required
@@ -83,7 +82,7 @@ def create_user():
         roles = get_all_role()
         if len(roles) == 0:
             flash('Can not load role lists. Please contact to administrator')
-        return render_template('management/pages/roles/create_user.html', title='Register', roles=roles)
+        return render_template('management/pages/user/create.html', title='Register', roles=roles)
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -127,6 +126,35 @@ def create_role():
 def role_list():
     all_role = get_all_role()
     return render_template('management/pages/role_list.html', role_data = all_role)
+
+@app.route('/admin/class/create', methods=['GET', 'POST'])
+@login_required
+def create_class():
+    if request.method == 'GET':
+        all_teacher = get_user_by_role(TEACHER_ROLE)
+        return render_template('management/pages/class/create.html', teacher_data = all_teacher)
+    if request.method == 'POST':
+        class_name = request.form['class_name']
+        teacher_id = request.form['teacher_id']
+        session['class_name'] = class_name
+        session['teacher_id'] = teacher_id
+        check_teacher = check_teacher_existed(teacher_id)
+        if check_teacher:
+            result = save_class(class_name)
+            if not result:
+                flash('Insert class' + class_name + 'failed')
+            else:
+                flash('Insert category' + class_name + 'successfully')
+                return redirect(url_for('admin_dashboard'))
+        else:
+            flash('This teacher has already taught other class')
+            return redirect(url_for('create_class'))
+
+@app.route('/admin/class/list')
+@login_required
+def class_list():
+    all_class = get_all_class()
+    return render_template('management/pages/class/list.html', class_data = all_class)
 
 
 

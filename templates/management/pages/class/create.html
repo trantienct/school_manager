@@ -1,0 +1,21 @@
+{% extends 'management/pages/base_layout.html' %}
+{% block header %}Create Class {% endblock %}
+{% block content %}
+<div class="col-6">
+    <form action="/admin/class/create" method="POST">
+        <div class="form-group">
+            <label class="form-label">Class name: </label>
+            <input class="form-control" value="{{ session.get('class_name') }}" name="class_name" type="text" required>
+            <select class = "form-control" name = "teacher_id">
+                {% for teacher in teacher_data %}
+                <option value="{{teacher[0]}}" {% if session.get('teacher_id') == teacher[0]%} selected {% endif %}>{{teacher[1]}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <button class="btn btn-info" type="reset">Reset</button>
+            <button class="btn btn-success" type="submit">Add class</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
