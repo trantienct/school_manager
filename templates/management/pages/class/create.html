@@ -3,6 +3,14 @@
 {% block content %}
 <div class="col-6">
     <form action="/admin/class/create" method="POST">
+        {% with messages = get_flashed_messages() %}
+        {% for message in messages  %}
+        <div class="alert-danger alert">
+            {{message }}
+        </div>
+        {% endfor %}
+        {% endwith %}
+
         <div class="form-group">
             <label class="form-label">Class name: </label>
             <input class="form-control" value="{{ session.get('class_name') }}" name="class_name" type="text" required>

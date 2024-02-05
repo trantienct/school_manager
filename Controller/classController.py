@@ -8,10 +8,10 @@ def check_teacher_existed(teacher_id):
     if len(result) > 0:
         return False
     return True
-def save_class(class_name):
+def save_class(class_name, teacher_id):
     conn = sqlite3.connect('school_management.db')
-    insert_query = 'INSERT INTO classes(class_name) VALUES(?)'
-    cur = conn.execute(insert_query, (class_name,))
+    insert_query = 'INSERT INTO classes(class_name, teacher_id) VALUES(?,?)'
+    cur = conn.execute(insert_query, (class_name, teacher_id))
     conn.commit()
     conn.close()
     if cur.lastrowid == 0:

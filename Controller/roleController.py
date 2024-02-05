@@ -25,3 +25,12 @@ def get_role_id_by_name(role_name):
         return False
     return result[0][0]
 
+def get_role_name_by_id(role_id):
+    conn = sqlite3.connect('school_management.db')
+    cur = conn.execute('SELECT role_name FROM roles WHERE id = ?', (role_id,))
+    result = cur.fetchall()
+    print(result)
+    if len(result) == 0 or len(result) > 1:
+        return False
+    return result[0][0]
+
