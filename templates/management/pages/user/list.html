@@ -1,27 +1,74 @@
 {% extends 'management/pages/base_layout.html' %}
-{% block header %}Role list{% endblock %}
+{% block header %}User List{% endblock %}
 {% block content %}
-<div class="col-6">
-    <table class="table">
-                                    <tr>
-                                        <td>ID</td>
-                                        <td>Username</td>
-                                        <td colspan="2" class="text-center">Action</td>
-                                    </tr>
-                                {% if not user_data %}
-                                        <tr><td colspan="5">No data!</td></tr>
-                                {% else %}
-                                    {% for user in user_data %}
-                                    <tr>
-                                        <td>{{ user[0]}}</td>
-                                        <td>{{ user[1]}}</td>
-                                        <td class="text-center"><a href="/admin/user/edit/{{ user[0] }}">Edit</a></td>
-                                        <td class="text-center"><a href="">Delete</a></td>
-                                    </tr>
-                                    {% endfor %}
-                                {% endif %}
-                                </table>
+
+    <div class="col-12">
+    <div class="card shadow mb-4">
+    <form action="/admin/user/list">
+        <div class="row align-items-center p-3">
+          <div class="col-3">
+            <label for="searchInput" class="sr-only">Search</label>
+            <input type="text" id="searchInput" name = "username" class="form-control mb-2" placeholder="Search by name">
+          </div>
+          <div class="col-3">
+            <select class="form-control mb-2" id="actived" name="is_actived">
+              <option value="">Actived?</option>
+              <option value="1">Yes</option>
+              <option value="0">No</option>
+              <!-- Add more roles as needed -->
+            </select>
+          </div>
+        <div class="col-3">
+        <select class="form-control mb-2" id="roleSelect" name="role_id">
+          <option value="">By Roles</option>
+          {% for role in roles %}
+            <option value="{{ role[0] }}">{{ role[1] }}</option>
+          {% endfor %}
+          <!-- Add more roles as needed -->
+        </select>
+          </div>
+          <div class="col-3">
+            <button type="submit" class="btn btn-primary mb-2">Search</button>
+          </div>
+        </div>
+      </form>
 </div>
+    <div class="card shadow mb-4">
+<table class="table table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Username</th>
+            <th scope="col">Roles</th>
+            <th scope="col">Actived?</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% if not user_data %}
+           <tr><td colspan="5">No data!</td></tr>
+        {% else %}
+            {% for user in user_data %}
 
+            <tr>
+                <th scope="row">{{ user[0] }}</th>
+                <td>{{ user[1]}}</td>
+                <td>{{ user[3] }}</td>
+                <td>{% if user[2] == 0 %} NO {% else %} YES {% endif %}</td>
+                <td>
+                {% if user[3] == student_role and user[4] == 0 %}
+                <a href='/student/{{ user[0] }}/add_user_info' class="btn btn-warning"><i class="far fa-address-card"></i></a>
+                {% endif %}
+                <a href="/admin/user/info/{{ user[0] }}" class="btn btn-primary"><i class="far fa-eye"></i></a>
+                <a href="/admin/user/edit/{{ user[0] }}" class="btn btn-success"><i class="fas fa-edit"></i></a>
+                <a href="" class="btn btn-danger"><i class="far fa-trash-alt"></i></a>
+                </td>
+            </tr>
+            {% endfor %}
+        {% endif %}
+        </tbody>
+      </table>
+    </div>
 
+    </div>
 {% endblock %}

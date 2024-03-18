@@ -4,6 +4,7 @@ from Controller.loginController import *
 from Controller.userController import *
 from Controller.classController import *
 from functools import wraps
+from myform import UserInfo
 app = Flask(__name__)
 app.secret_key='abcda1234'
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -11,7 +12,7 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
 def access_allow(allowed_role):
-    user_role = get_role_name_by_id(session.get('user_id'))
+    user_role = get_role_name_by_user_id(session.get('user_id'))
     if user_role in allowed_role:
         return True
     return False
@@ -52,14 +53,68 @@ def admin_login():  # put application's code here
         else:
             flash('Your username/ password is not correct. PLease try again')
             return redirect(url_for('admin_login'))
+
+@app.route('/admin/user/info/<user_id>', methods = ['GET', 'POST'])
+def user_info(user_id):
+    message = ''
+    check_user = get_user_by_id(user_id)
+    if not check_user:
+        message = 'This user does not exists'
+    user_info = get_user_info_by_id(user_id)
+    if not user_info:
+        message = 'This user does not have any user info'
+    return render_template('management/pages/user/info.html', message=message, user = user_info)
+
 @app.route('/admin/user/list')
 @login_required
 def user_list():
     check_access = access_allow((ADMIN_ROLE,))
+    print(check_access)
     if not check_access:
         return redirect(url_for('admin_dashboard'))
-    all_user = get_all_user()
-    return render_template('management/pages/user/list.html', user_data = all_user)
+    if request.method == 'GET':
+        username = request.args.get('username')
+        actived = request.args.get('is_actived')
+        role_id = request.args.get('role_id')
+        list_user = search_user(username, actived, role_id)
+        roles = get_all_role()
+    return render_template('management/pages/user/list.html', user_data = list_user,roles = roles, student_role = STUDENT_ROLE )
+
+@app.route('/student/<student_id>', methods=['GET', 'POST'])
+@login_required
+def show_user_info(student_id):
+    pass
+
+@app.route('/student/<student_id>/add_user_info', methods=['GET', 'POST'])
+@login_required
+def add_user_info(student_id):
+    user_info_form = UserInfo()
+    user_info_form.user_id.data = student_id
+    user_info_form.user_id.render_kw = {'disabled': True}
+    if request.method == 'GET':
+        return render_template('management/pages/user_info/add_info.html', form=user_info_form, student_id = student_id )
+    if request.method == 'POST':
+        user_id = request.form['user_id']
+        fullname = request.form['fullname']
+        birthday = request.form['birthday']
+        address = request.form['address']
+        gender = request.form['gender']
+        phone_number = request.form['phone_number']
+        mother_name = request.form['mother_name']
+        father_name = request.form['father_name']
+        # image_file = request.files['image']
+        print(user_id)
+        check_user_id = get_user_by_id(user_id)
+        if not check_user_id:
+            flash('We can not find your user')
+            return redirect(url_for('add_user_info'))
+        check_role_name = get_role_name_by_user_id(user_id)
+        if check_role_name != STUDENT_ROLE:
+            flash('Your role is not student')
+            return redirect(url_for('add_user_info'))
+        save_user_info = insert_user_info(user_id,fullname,gender,birthday,address,phone_number,father_name,mother_name)
+        return redirect(url_for('user_list'))
+
 @app.route('/admin/user/edit/<user_id>', methods = ['GET', 'POST'])
 @login_required
 def user_edit(user_id):

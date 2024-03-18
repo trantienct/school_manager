@@ -4,6 +4,7 @@ import sqlite3
 from Controller.roleController import *
 from Config.constant import *
 from datetime import datetime
+import os
 
 def check_username(username):
     conn = sqlite3.connect('school_management.db')
@@ -40,6 +41,13 @@ def count_user():
     row = user.fetchone()
     return row[0]
 
+def get_user_info_by_id(user_id):
+    conn = sqlite3.connect('school_management.db')
+    cur = conn.execute('SELECT * FROM user_info WHERE user_id = ?',(user_id))
+    user_info = cur.fetchone()
+    if user_info:
+        return user_info
+    return False
 def count_user_by_role(role_name):
     conn = sqlite3.connect('school_management.db')
     cur = conn.execute('SELECT COUNT(*) FROM user_role JOIN roles ON user_role.role_id = roles.id WHERE roles.role_name = ?',(role_name, ))
@@ -49,9 +57,9 @@ def count_user_by_role(role_name):
 def get_user_by_id(user_id):
     conn = sqlite3.connect('school_management.db')
     cur = conn.execute('SELECT users.username, users.is_active, user_role.role_id FROM users JOIN user_role ON users.id = user_role.user_id WHERE users.id = ?',(user_id))
-    user_info = cur.fetchone()
-    if user_info:
-        return user_info
+    user = cur.fetchone()
+    if user:
+        return user
     return False
 
 def get_user_by_role(role_name):
@@ -66,4 +74,52 @@ def get_user_by_role(role_name):
     if len(result) == 0:
         return False
     return result
+
+def search_user(username, is_active, role_id):
+    conn = sqlite3.connect('school_management.db')
+    query = '''
+            SELECT users.id, users.username, users.is_active, roles.role_name
+            FROM users JOIN user_role ON users.id = user_role.user_id
+            JOIN roles ON user_role.role_id = roles.id'''
+    condition = []
+    value = []
+    if username:
+        condition.append('username LIKE ?')
+        value.append('%' + username + '%')
+    if is_active:
+        condition.append('is_active LIKE ?')
+        value.append('%' + is_active + '%')
+    if role_id:
+        condition.append('role_id LIKE ?')
+        value.append('%' + role_id + '%')
+    if len(condition) > 0:
+        condition2 = " AND ".join(condition)
+        query = query + ' WHERE ' + condition2
+    cur = conn.execute(query, value)
+    row = cur.fetchall()
+    row2 = [list(x) for x in row]
+    result = []
+    for user in row2:
+        user_id = user[0]
+        check = conn.execute('SELECT * FROM user_info WHERE user_id = ?',(user_id,))
+        row3 = check.fetchall()
+        if len(row3) > 0:
+            user.append(1)
+        else:
+            user.append(0)
+        result.append(user)
+    print(result)
+    return result
+
+def insert_user_info(user_id, fullname, gender, birthday, address, phone_number, father_name, mother_name):
+    create_at = datetime.now()
+    # filepath = os.path.join('../uploads', image.filename)
+    # image.save(filepath)
+    conn = sqlite3.connect('school_management.db')
+    cur = conn.execute('INSERT INTO user_info(user_id, fullname, gender, birthday, address, phone_number, father_name, mother_name,  create_at, create_by) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+                       (user_id, fullname, gender, birthday, address, phone_number, father_name, mother_name, create_at, session.get('user_id')))
+    conn.commit()
+    conn.close()
+    return True
+
 

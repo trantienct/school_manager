@@ -1,0 +1,17 @@
+{% extends 'management/pages/base_layout.html' %}
+{% block header %}User info  {% endblock %}
+{% block content %}
+<div class="col-6">
+{% if message != '' %}
+{{ message }}
+{% else %}
+    <div class="form-group">
+        <label class="form-label">Fullname: {{ user[2] }}</label>
+        <label class="form-label">Gender:{% if user[3] == 0 %} Male {% else %} Female {% endif %} </label>
+        <label class="form-label">Birthday: {{ user[4] }} </label>
+        <label class="form-label">Address: {{ user[5] }}</label>
+        <label class="form-label">Phone number: {{ user[6] }}</label>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

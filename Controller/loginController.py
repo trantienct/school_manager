@@ -18,7 +18,10 @@ def log_in(username,password):
 
 def get_all_user():
     conn = sqlite3.connect('school_management.db')
-    sql = 'SELECT id, username FROM users'
+    sql = ''' 
+        SELECT users.id, users.username, users.is_active, roles.role_name
+        FROM users JOIN user_role ON users.id = user_role.user_id
+        JOIN roles ON user_role.role_id = roles.id'''
     cur = conn.execute(sql)
     result = cur.fetchall()
     return result

@@ -3,4 +3,8 @@ conn = sqlite3.connect('school_management.db')
 
 cur = conn.execute('SELECT * FROM users')
 row = cur.fetchall()
-print(row)
+
+
+list = [(1,'ad'), (2, 'bc')]
+list_comprehension = [x for x in list]
+print(list_comprehension)
