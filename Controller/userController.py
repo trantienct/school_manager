@@ -111,13 +111,13 @@ def search_user(username, is_active, role_id):
     print(result)
     return result
 
-def insert_user_info(user_id, fullname, gender, birthday, address, phone_number, father_name, mother_name):
+def insert_user_info(user_id, fullname, gender, birthday, address, image, phone_number, father_name, mother_name):
     create_at = datetime.now()
-    # filepath = os.path.join('../uploads', image.filename)
-    # image.save(filepath)
+    filepath = os.path.join('uploads', image.filename)
+    image.save(filepath)
     conn = sqlite3.connect('school_management.db')
-    cur = conn.execute('INSERT INTO user_info(user_id, fullname, gender, birthday, address, phone_number, father_name, mother_name,  create_at, create_by) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
-                       (user_id, fullname, gender, birthday, address, phone_number, father_name, mother_name, create_at, session.get('user_id')))
+    cur = conn.execute('INSERT INTO user_info(user_id, full_name, gender, birthday, address, phone_number, father_name, mother_name, image, create_at, created_by) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+                       (user_id, fullname, gender, birthday, address, phone_number, father_name, mother_name, image.filename, create_at, session.get('user_id')))
     conn.commit()
     conn.close()
     return True

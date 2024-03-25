@@ -94,7 +94,7 @@ def add_user_info(student_id):
     if request.method == 'GET':
         return render_template('management/pages/user_info/add_info.html', form=user_info_form, student_id = student_id )
     if request.method == 'POST':
-        user_id = request.form['user_id']
+        user_id = user_info_form.user_id.data
         fullname = request.form['fullname']
         birthday = request.form['birthday']
         address = request.form['address']
@@ -102,7 +102,7 @@ def add_user_info(student_id):
         phone_number = request.form['phone_number']
         mother_name = request.form['mother_name']
         father_name = request.form['father_name']
-        # image_file = request.files['image']
+        image_file = request.files['image']
         print(user_id)
         check_user_id = get_user_by_id(user_id)
         if not check_user_id:
@@ -112,7 +112,8 @@ def add_user_info(student_id):
         if check_role_name != STUDENT_ROLE:
             flash('Your role is not student')
             return redirect(url_for('add_user_info'))
-        save_user_info = insert_user_info(user_id,fullname,gender,birthday,address,phone_number,father_name,mother_name)
+
+        save_user_info = insert_user_info(user_id,fullname,gender,birthday,address,image_file,phone_number,father_name,mother_name)
         return redirect(url_for('user_list'))
 
 @app.route('/admin/user/edit/<user_id>', methods = ['GET', 'POST'])
